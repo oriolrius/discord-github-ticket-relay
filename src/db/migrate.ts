@@ -10,7 +10,7 @@ const MIGRATIONS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '
  * once: the whole run happens inside one write transaction (BEGIN IMMEDIATE).
  */
 export async function migrate(db: Db, log: (msg: string) => void = () => {}): Promise<string[]> {
-  const files = (await readdir(MIGRATIONS_DIR)).filter((f) => f.endsWith('.sql')).sort();
+  const files = (await readdir(MIGRATIONS_DIR)).filter((f) => f.endsWith('.sql')).sort((a, b) => Number(a > b) - Number(a < b));
   const scripts = await Promise.all(files.map(async (f) => [f, await readFile(path.join(MIGRATIONS_DIR, f), 'utf8')] as const));
   return db.transaction(async (tx) => {
     await tx.query('CREATE TABLE IF NOT EXISTS schema_migrations (name TEXT PRIMARY KEY, applied_at INTEGER NOT NULL DEFAULT (now_ms()))');

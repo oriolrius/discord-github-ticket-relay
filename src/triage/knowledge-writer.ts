@@ -134,6 +134,13 @@ const cut = (text: string, max: number) => {
   return t.length > max ? `${t.slice(0, max - 1)}…` : t;
 };
 
+/** `line` without its trailing spaces and tabs. */
+function trimEndSpaces(line: string): string {
+  let end = line.length;
+  while (end > 0 && (line[end - 1] === ' ' || line[end - 1] === '\t')) end--;
+  return line.slice(0, end);
+}
+
 /** A document without its badges, images, HTML and comments, cut to size. */
 export function cleanDoc(text: string, max: number): string {
   return text
@@ -142,7 +149,7 @@ export function cleanDoc(text: string, max: number): string {
     .replace(/\[\s*\]\([^)]*\)/g, '')
     .replace(/<img[^>]*>/gi, '')
     .replace(/<\/?(p|div|span|a|br|picture|source|img|h\d|center|details|summary|sup|sub|b|i)\b[^>]*>/gi, '')
-    .split('\n').map((l) => l.replace(/[ \t]+$/, '')).join('\n')
+    .split('\n').map(trimEndSpaces).join('\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
     .slice(0, max);

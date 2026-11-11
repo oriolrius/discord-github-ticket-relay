@@ -196,7 +196,7 @@ async function gather(web: Web, ctx: WorkspaceRequestContext) {
   const [repos, names] = await Promise.all([indexStatus(deps.db, [...new Set(apps.map((a) => a.repo_id))]), userNames(deps.db, [dev.by])]);
   const github = h.running.map((p) => p.stats?.github).filter((g): g is NonNullable<typeof g> => Boolean(g)).sort((a, b) => b.at.localeCompare(a.at))[0] ?? null;
   const count = (s: string) => filing.find((f) => f.status === s)?.n ?? 0;
-  const oldestQueued = filing.filter((f) => f.status === 'pending' || f.status === 'processing').map((f) => f.oldest).filter((n): n is number => n !== null).sort()[0] ?? null;
+  const oldestQueued = filing.filter((f) => f.status === 'pending' || f.status === 'processing').map((f) => f.oldest).filter((n): n is number => n !== null).sort((a, b) => a - b)[0] ?? null;
   return { dev: { ...dev, byName: dev.by ? names.get(dev.by) ?? null : null }, h, samples, disk, dbBytes: dbFile + walFile, files, filing: { queued: count('pending') + count('processing'), unconfirmed: count('uncertain'), failed: count('failed'), failedDay, filedDay, oldestQueued }, triage, triageCounts, repos, cleanup, claude, github };
 }
 
